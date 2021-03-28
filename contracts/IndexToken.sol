@@ -12,9 +12,9 @@ contract IndexToken is ERC20, ERC20Burnable, Ownable {
 
     using SafeMath for uint256;
 
-    address token0; /** wBTC **/
-    address token1; /**  wETH **/
-    address token2; /** Stable **/
+    address public token0; 
+    address public token1; 
+    address public token2;
     address token0_uni;
     address token1_uni;
     address token2_uni;
@@ -43,17 +43,33 @@ contract IndexToken is ERC20, ERC20Burnable, Ownable {
     }
 
     function buyIndex(uint256 tokens_amount) public {
-        uint256 memory token0_amount = tokens_amount.div(3).mul(2);
-        uint256 memory token1_amount = tokens_amount.div(3);
-        require(IERC(token0).balanceOf(msg.sender) >=  token0_amount, "Token0 is low balance");
-        require(IERC(token1).balanceOf(msg.sender) >=  token1_amount, "Token1 is low balance");
+        uint256 token0_amount = tokens_amount.div(3).mul(2);
+        uint256 token1_amount = tokens_amount.div(3);
+        require(IERC20(token0).balanceOf(msg.sender) >=  token0_amount, "Token0 is low balance");
+        require(IERC20(token1).balanceOf(msg.sender) >=  token1_amount, "Token1 is low balance");
 
         /** transfer tokens **/
-        require(IERC(token0).transferFrom(msg.sender, address(this), token0_amount), "Failed to transfer token0");
-        require(IERC(token1).transferFrom(msg.sender, address(this), token1_amount), "Failed to transfer token1");
+        require(IERC20(token0).transferFrom(msg.sender, address(this), token0_amount), "Failed to transfer token0");
+        require(IERC20(token1).transferFrom(msg.sender, address(this), token1_amount), "Failed to transfer token1");
 
         emit IndexBuy(msg.sender, token0_amount, token1_amount, tokens_amount);
 
         _mint(msg.sender, tokens_amount);
+    }
+
+    function sellIndex(uint256 tokens_amount) public {
+
+        require(balanceOf(msg.sender) >= tokens_amount, "Invalid index amount");
+
+        uint256 token0_amount = tokens_amount.div(3).mul(2);
+        uint256 token1_amount = tokens_amount.div(3);
+
+        /** transfer tokens **/
+        require(IERC20(token0).transferFrom(address(this), msg.sender, token0_amount), "Failed to transfer token0");
+        require(IERC20(token1).transferFrom(address(this), msg.sender, token1_amount), "Failed to transfer token1");
+
+        emit IndexSell(msg.sender, token0_amount, token1_amount, tokens_amount);
+
+        _burn(msg.sender, tokens_amount);
     }
 }
