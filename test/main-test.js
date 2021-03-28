@@ -83,6 +83,9 @@ describe("Main Test", function () {
 
     let index_in_acc0_bal = await this.index.balanceOf(acc_addr0);
     expect(index_in_acc0_bal.toString()).is.equals(hre.ethers.utils.parseEther('10').toString());
+
+    let index_token_total_supply = await this.index.totalSupply();
+    expect(index_token_total_supply.toString()).is.equals(hre.ethers.utils.parseEther('10').toString());
   });
 
   it('Test sell index method', async function () {
@@ -110,5 +113,7 @@ describe("Main Test", function () {
     expect(wbtc_balance_acc0.toString()).is.equals(wbtc_total_supply.toString());
     expect(weth_balance_acc0.toString()).is.equals(weth_total_supply.toString());
 
+    let index_token_total_supply = await this.index.totalSupply();
+    expect(index_token_total_supply.toString()).is.equals('0');
   });
 });
